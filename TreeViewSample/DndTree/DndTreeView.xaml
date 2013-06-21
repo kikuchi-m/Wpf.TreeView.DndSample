@@ -1,0 +1,90 @@
+﻿<UserControl x:Class="TreeViewSample.DndTree.DndTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TreeViewSample"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+    <UserControl.Resources>
+        <Style x:Key="TreeElementStyleBase" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="IsExpanded" Value="True"/>
+            <Setter Property="AllowDrop" Value="True"/>
+            
+            <EventSetter Event="Selected" Handler="TreeElement_Selected"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown"/>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_PreviewMouseLeftButtonDown"/>
+            <EventSetter Event="MouseMove" Handler="TreeViewItem_MouseMove"/>
+            <EventSetter Event="DragOver" Handler="TreeViewItem_DragOver"/>
+            <EventSetter Event="Drop" Handler="TreeViewItem_Drop"/>
+        </Style>
+        <Style x:Key="TreeNodeStyle" BasedOn="{StaticResource TreeElementStyleBase}"
+               TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Foreground" Value="#FF4248D1"/>
+            <Setter Property="AlternationCount" Value="{Binding Children.Count}"/>
+        </Style>
+        <Style x:Key="TreeLeafStyle" BasedOn="{StaticResource TreeElementStyleBase}"
+               TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Foreground" Value="#FF0C833E"/>
+        </Style>
+
+        <HierarchicalDataTemplate x:Key="NodeTemplate" ItemsSource="{Binding Children}">
+            <TextBlock>
+                <TextBlock Text="{Binding Name}"/>
+                <Run> (Children : </Run>
+                <TextBlock Text="{Binding Children.Count}"/>
+                <Run>)</Run>
+            </TextBlock>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="LeafTemplate">
+            <TextBlock>
+                <TextBlock Text="{Binding Name}"/>
+                <Run> (Image : </Run>
+                <TextBlock Text="{Binding Image}"/>
+                <Run>)</Run>
+            </TextBlock>
+        </HierarchicalDataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <TextBlock x:Name="Selected"/>
+                        <TextBlock x:Name="ParentOfSelected"/>
+                        <TextBlock x:Name="IndexToParent"/>
+                    </StackPanel>
+                    <TreeView Grid.Row="1" x:Name="DndTree"
+                          ItemsSource="{Binding TreeSource}"
+                              AlternationCount="{Binding TreeSource.Count}">
+                        <TreeView.ItemContainerStyleSelector>
+                            <local:TreeElementStyleSelector 
+                                NodeStyle="{StaticResource TreeNodeStyle}"
+                                LeafStyle="{StaticResource TreeLeafStyle}"/>
+                        </TreeView.ItemContainerStyleSelector>
+                        <TreeView.ItemTemplateSelector>
+                            <local:TreeElementTemplateSelector
+                                NodeTemplate="{StaticResource NodeTemplate}"
+                                LeafTEmplate="{StaticResource LeafTemplate}"/>
+                        </TreeView.ItemTemplateSelector>
+                    </TreeView>
+                </Grid>
+            </Grid>
+        </Border>
+        <Border Grid.Column="1">
+        </Border>
+    </Grid>
+</UserControl>
